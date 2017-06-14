@@ -2,13 +2,16 @@ var bodyParser = require("body-parser"),
     express = require("express"),
     mongoose = require("mongoose"),
     methodOverride = require("method-override"),
+    expressSanitizer = require("express-sanitizer"),
     app = express();
     
 mongoose.connect("mongodb://localhost/blogapp");
 app.set("view engine", "ejs");
 app.use(express.static("public"));
 app.use(bodyParser.urlencoded({extended:true}));
+app.use(expressSanitizer());
 app.use(methodOverride("_method"))
+
 
 var blogSchema = new mongoose.Schema({
     title: String,
@@ -23,12 +26,12 @@ var blogSchema = new mongoose.Schema({
 
 var Blog = mongoose.model("Blog", blogSchema);
 
-Blog.create({
-    title : "Test Blog",
-    image: "http://forkliftsystems.com.au/wp-content/uploads/2015/04/placeholder-1000x400-800x400.png",
-    body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-    description:"Lorem ipsum awaits you.."
-});
+// Blog.create({
+//     title : "Test Blog",
+//     image: "http://forkliftsystems.com.au/wp-content/uploads/2015/04/placeholder-1000x400-800x400.png",
+//     body: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
+//     description:"Lorem ipsum awaits you.."
+// });
 
 //RESTful Routes
 
@@ -56,8 +59,12 @@ app.get("/blogs/new", function(req, res) {
 
 // CREATE ROUTE
 app.post("/blogs",function(req,res){
-   //create blog
-   Blog.create(req.body.blog,function(err,newBlog){
+    //create blog
+    console.log(req.body);
+    console.log("=========================");
+    req.body.blog.body = req.sanitize(req.body.blog.body);
+    console.log(req.body);
+    Blog.create(req.body.blog,function(err,newBlog){
        if(err){
            res.render("new");
        }else {
@@ -69,7 +76,7 @@ app.post("/blogs",function(req,res){
 
 //SHOW ROUTE
 app.get("/blogs/:id", function(req, res) {
-   Blog.findById(req.params.id, function(err, foundBlog){
+    Blog.findById(req.params.id, function(err, foundBlog){
       if(err){
           res.redirect("/blogs");
       } else{
@@ -90,7 +97,8 @@ app.get("/blogs/:id/edit",function(req, res) {
 });
 //UPDATE ROUTE
 app.put("/blogs/:id",function(req,res){
-   Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
+    req.body.blog.body = req.sanitize(req.body.blog.body);
+    Blog.findByIdAndUpdate(req.params.id, req.body.blog, function(err, updatedBlog){
        if(err){
            res.redirect("/blogs");
        }else{

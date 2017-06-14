@@ -30,3 +30,8 @@
 # DESTROY
 * Add DESTROY route
 * Add EDIT and DESTROY links
+
+# Final Updates
+* Sanitize blog body
+* Style Index
+* Update REST table
