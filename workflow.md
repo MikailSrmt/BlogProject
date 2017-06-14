@@ -14,3 +14,19 @@
 * Add CREATE route
 * Add CREATE template
 
+# SHOW Time
+* Add SHOW route
+* Add SHOW template
+* Add links to showpage
+* Style show template
+
+# EDIT and UPDATE
+* Add EDIT route
+* Add EDIT form
+* Add UPDATE route
+* Add UPDATE form
+* Add Method-Override
+
+# DESTROY
+* Add DESTROY route
+* Add EDIT and DESTROY links
